@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import BookForm from '../components/BookForm';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AdminPage() {
   const [books, setBooks] = useState([]);
   const [editing, setEditing] = useState(null);
   const [status, setStatus] = useState('');
+  const { t } = useLanguage();
 
   async function loadBooks() {
     const { data } = await api.get('/books');
@@ -20,34 +22,34 @@ export default function AdminPage() {
     try {
       if (editing) {
         await api.put(`/admin/books/${editing.id}`, payload);
-        setStatus('Book updated successfully.');
+        setStatus(t('book_updated'));
       } else {
         await api.post('/admin/books', payload);
-        setStatus('Book created successfully.');
+        setStatus(t('book_created'));
       }
 
       setEditing(null);
       await loadBooks();
     } catch (error) {
-      setStatus(error.response?.data?.message || 'Book operation failed.');
+      setStatus(error.response?.data?.message || t('book_operation_failed'));
     }
   }
 
   async function removeBook(id) {
     try {
       await api.delete(`/admin/books/${id}`);
-      setStatus('Book deleted successfully.');
+      setStatus(t('book_deleted'));
       if (editing?.id === id) {
         setEditing(null);
       }
       await loadBooks();
     } catch (error) {
-      setStatus(error.response?.data?.message || 'Delete failed.');
+      setStatus(error.response?.data?.message || t('delete_failed'));
     }
   }
 
   async function resetDatabase() {
-    const confirmed = window.confirm('This will delete all current data and reseed demo data. Continue?');
+    const confirmed = window.confirm(t('confirm_reset'));
     if (!confirmed) {
       return;
     }
@@ -58,15 +60,15 @@ export default function AdminPage() {
       setEditing(null);
       await loadBooks();
     } catch (error) {
-      setStatus(error.response?.data?.message || 'Reset failed.');
+      setStatus(error.response?.data?.message || t('reset_failed'));
     }
   }
 
   return (
     <section className="page admin-page">
       <div className="page-head">
-        <h2>Admin management</h2>
-        <p>Maintain catalog data and reset seed data for demos.</p>
+        <h2>{t('admin_title')}</h2>
+        <p>{t('admin_subtitle')}</p>
       </div>
 
       <div className="admin-grid">
@@ -74,9 +76,9 @@ export default function AdminPage() {
 
         <div className="admin-panel">
           <div className="panel-head">
-            <h3>Books ({books.length}/25)</h3>
+            <h3>{t('books_count', { count: books.length })}</h3>
             <button type="button" className="danger-btn" onClick={resetDatabase}>
-              Admin reset
+              {t('admin_reset')}
             </button>
           </div>
 
@@ -84,11 +86,11 @@ export default function AdminPage() {
             <table>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Author</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                  <th>Actions</th>
+                  <th>{t('name')}</th>
+                  <th>{t('author')}</th>
+                  <th>{t('price')}</th>
+                  <th>{t('stock')}</th>
+                  <th>{t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -100,10 +102,7 @@ export default function AdminPage() {
                     <td>{book.stock}</td>
                     <td className="actions">
                       <button type="button" onClick={() => setEditing(book)}>
-                        Edit
-                      </button>
-                      <button type="button" className="ghost-btn" onClick={() => removeBook(book.id)}>
-                        Delete
+                        {t('edit')}
                       </button>
                     </td>
                   </tr>

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function CartPage() {
   const { items, total, setQuantity, clearCart } = useCart();
   const [status, setStatus] = useState('');
+  const { t } = useLanguage();
 
   useEffect(() => {
     setStatus('');
@@ -16,17 +18,17 @@ export default function CartPage() {
         items: items.map((item) => ({ bookId: item.bookId, quantity: item.quantity })),
       });
       clearCart();
-      setStatus('Purchase completed successfully. Enjoy your books.');
+      setStatus(t('checkout_success'));
     } catch (error) {
-      setStatus(error.response?.data?.message || 'Purchase could not be completed.');
+      setStatus(error.response?.data?.message || t('checkout_fail'));
     }
   }
 
   return (
     <section className="page cart-page">
       <div className="page-head">
-        <h2>Your cart</h2>
-        <p>Purchase completed successfully. Enjoy your books.</p>
+        <h2>{t('cart_title')}</h2>
+        <p>{t('cart_subtitle')}</p>
       </div>
 
       <div className="cart-list">
@@ -39,6 +41,7 @@ export default function CartPage() {
             <input
               type="number"
               min="1"
+              max={item.stock || undefined}
               value={item.quantity}
               onChange={(e) => setQuantity(item.bookId, Number(e.target.value))}
             />
@@ -48,9 +51,9 @@ export default function CartPage() {
       </div>
 
       <div className="checkout-panel">
-        <h3>Total: ${total.toFixed(2)}</h3>
+        <h3>{t('cart_total', { total: total.toFixed(2) })}</h3>
         <button type="button" onClick={checkout} disabled={items.length === 0}>
-          Buy now
+          {t('buy_now')}
         </button>
       </div>
 

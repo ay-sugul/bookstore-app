@@ -12,11 +12,13 @@ import {
   YAxis,
 } from 'recharts';
 import { api } from '../api/client';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function DashboardPage() {
   const [monthly, setMonthly] = useState([]);
   const [yearly, setYearly] = useState([]);
   const [topBooks, setTopBooks] = useState([]);
+  const { t } = useLanguage();
 
   useEffect(() => {
     async function load() {
@@ -42,13 +44,13 @@ export default function DashboardPage() {
   return (
     <section className="page dashboard-page">
       <div className="page-head">
-        <h2>Store insights</h2>
-        <p>Monthly revenue, yearly revenue, and top selling books.</p>
+        <h2>{t('dashboard_title')}</h2>
+        <p>{t('dashboard_subtitle')}</p>
       </div>
 
       <div className="charts-grid">
         <article className="chart-card">
-          <h3>Monthly revenue</h3>
+          <h3>{t('monthly_revenue')}</h3>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={monthly}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -62,7 +64,7 @@ export default function DashboardPage() {
         </article>
 
         <article className="chart-card">
-          <h3>Yearly revenue</h3>
+          <h3>{t('yearly_revenue')}</h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={yearly}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -77,15 +79,15 @@ export default function DashboardPage() {
       </div>
 
       <article className="chart-card">
-        <h3>Top selling books</h3>
+        <h3>{t('top_selling_books')}</h3>
         <div className="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Book</th>
-                <th>Author</th>
-                <th>Units sold</th>
-                <th>Revenue</th>
+                <th>{t('book')}</th>
+                <th>{t('author')}</th>
+                <th>{t('units_sold')}</th>
+                <th>{t('revenue')}</th>
               </tr>
             </thead>
             <tbody>

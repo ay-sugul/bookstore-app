@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('client');
-  const [password, setPassword] = useState('client123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
 
   async function submit(event) {
@@ -17,30 +19,31 @@ export default function LoginPage() {
       await login(username, password);
       navigate('/books');
     } catch {
-      setError('Invalid credentials. Try one of the provided role accounts.');
+      setError(t('invalid_credentials'));
     }
   }
 
   return (
     <div className="login-page">
       <div className="login-card">
-        <h1>Paper Harbor Bookstore</h1>
-        <p>Sign in with one of the demo roles.</p>
-        <ul className="credentials-list">
-          <li>Customer: client / client123</li>
-          <li>Manager: manager / manager123</li>
-          <li>Admin: admin / admin123</li>
-        </ul>
+        <div className="login-toolbar">
+          <button type="button" className="ghost-btn lang-toggle" onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}>
+            {t('language_toggle')}
+          </button>
+        </div>
+        <img src="/icons.png" alt="Paper Harbor logo" className="login-logo" style={{ width: "450px", height: "auto" }} />
+        <h1>{t('login_title')}</h1>
+        <p>{t('login_subtitle')}</p>
         <form onSubmit={submit} className="login-form">
-          <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required />
+          <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t('username_placeholder')} required />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
+            placeholder={t('password_placeholder')}
             required
           />
-          <button type="submit">Sign in</button>
+          <button type="submit">{t('login_button')}</button>
           {error && <p className="error-text">{error}</p>}
         </form>
       </div>

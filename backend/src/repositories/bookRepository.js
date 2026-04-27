@@ -5,9 +5,9 @@ function listBooks(filters) {
   const params = [];
 
   if (filters.search) {
-    where.push('(LOWER(title) LIKE ? OR LOWER(author) LIKE ? OR LOWER(description) LIKE ?)');
+    where.push('LOWER(title) LIKE ?');
     const query = `%${filters.search.toLowerCase()}%`;
-    params.push(query, query, query);
+    params.push(query);
   }
 
   if (filters.author) {
@@ -82,8 +82,13 @@ function updateBook(id, updates) {
 }
 
 function deleteBook(id) {
-  const result = db.prepare('DELETE FROM books WHERE id = ?').run(id);
-  return result.changes > 0;
+  const trx = db.transaction(() => {
+    db.prepare('DELETE FROM order_items WHERE book_id = ?').run(id);
+    const result = db.prepare('DELETE FROM books WHERE id = ?').run(id);
+    return result.changes > 0;
+  });
+
+  return trx();
 }
 
 module.exports = {

@@ -3,6 +3,7 @@ import { api } from '../api/client';
 import BookCard from '../components/BookCard';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function BooksPage() {
   const [books, setBooks] = useState([]);
@@ -15,7 +16,8 @@ export default function BooksPage() {
   });
   const [message, setMessage] = useState('');
   const { role } = useAuth();
-  const { addToCart } = useCart();
+  const { addToCart, items } = useCart();
+  const { t } = useLanguage();
 
   async function loadBooks() {
     const params = {
@@ -39,33 +41,38 @@ export default function BooksPage() {
   }
 
   function onAdd(book) {
-    addToCart(book);
-    setMessage(`${book.title} added to cart.`);
+    const added = addToCart(book);
+    setMessage(added ? t('added_to_cart', { title: book.title }) : t('stock_limit', { title: book.title }));
     setTimeout(() => setMessage(''), 1300);
   }
+
+  const cartCounts = items.reduce((acc, item) => {
+    acc[item.bookId] = item.quantity;
+    return acc;
+  }, {});
 
   const canBuy = role === 'customer';
 
   return (
     <section className="page books-page">
       <div className="page-head">
-        <h2>Discover books</h2>
-        <p>Search, filter, and explore up to 25 curated titles.</p>
+        <h2>{t('books_title')}</h2>
+        <p>{t('books_subtitle')}</p>
       </div>
 
       <div className="filters">
         <input
-          placeholder="Search title, author, description"
+          placeholder={t('search_title')}
           value={filters.search}
           onChange={(e) => update('search', e.target.value)}
         />
         <input
-          placeholder="Filter by author"
+          placeholder={t('filter_author')}
           value={filters.author}
           onChange={(e) => update('author', e.target.value)}
         />
         <input
-          placeholder="Min price"
+          placeholder={t('min_price')}
           type="number"
           min="0"
           step="0.01"
@@ -73,7 +80,7 @@ export default function BooksPage() {
           onChange={(e) => update('minPrice', e.target.value)}
         />
         <input
-          placeholder="Max price"
+          placeholder={t('max_price')}
           type="number"
           min="0"
           step="0.01"
@@ -86,7 +93,7 @@ export default function BooksPage() {
             checked={filters.inStockOnly}
             onChange={(e) => update('inStockOnly', e.target.checked)}
           />
-          In stock only
+          {t('in_stock_only')}
         </label>
       </div>
 
@@ -94,7 +101,7 @@ export default function BooksPage() {
 
       <div className="book-grid">
         {books.map((book) => (
-          <BookCard key={book.id} book={book} canBuy={canBuy} onAdd={onAdd} />
+          <BookCard key={book.id} book={book} canBuy={canBuy} onAdd={onAdd} cartQuantity={cartCounts[book.id] || 0} />
         ))}
       </div>
     </section>

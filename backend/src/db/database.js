@@ -125,6 +125,19 @@ function seedOrders() {
   trx();
 }
 
+function normalizeBookImages() {
+  db.prepare(
+    `UPDATE books
+     SET image_url = ?
+     WHERE title = ? AND (image_url LIKE ? OR image_url = ?)`
+  ).run(
+    'https://covers.openlibrary.org/b/isbn/9781503280786-L.jpg',
+    'Moby-Dick',
+    '%.svg',
+    '/moby-dick.svg',
+  );
+}
+
 function clearDatabase() {
   db.exec(`
     DELETE FROM order_items;
@@ -147,6 +160,8 @@ function initializeDatabase() {
   if (userCount === 0) {
     seedDatabase();
   }
+
+  normalizeBookImages();
 }
 
 function resetAndReseed() {

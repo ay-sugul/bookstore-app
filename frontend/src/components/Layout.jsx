@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function roleLinks(role) {
   const links = [{ to: '/books', label: 'Books' }];
@@ -21,6 +22,7 @@ function roleLinks(role) {
 
 export default function Layout() {
   const { user, role, logout } = useAuth();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
 
   function onLogout() {
@@ -41,15 +43,18 @@ export default function Layout() {
               to={item.to}
               className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
             >
-              {item.label}
+              {t(`nav_${item.label.toLowerCase()}`)}
             </NavLink>
           ))}
         </nav>
         <div className="user-pill">
-          <span>{user?.displayName}</span>
-          <span className="role-tag">{role}</span>
+          <span>{user?.username}</span>
+          <span className="role-tag">{t(`role_${role}`)}</span>
+          <button type="button" className="ghost-btn lang-toggle" onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}>
+            {t('language_toggle')}
+          </button>
           <button type="button" className="ghost-btn" onClick={onLogout}>
-            Logout
+            {t('logout')}
           </button>
         </div>
       </header>

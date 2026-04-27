@@ -14,13 +14,22 @@ export function CartProvider({ children }) {
   }
 
   function addToCart(book) {
+    const stock = Number(book.stock) || 0;
     const existing = items.find((item) => item.bookId === book.id);
     if (existing) {
+      if (existing.quantity >= stock) {
+        return false;
+      }
+
       const updated = items.map((item) =>
-        item.bookId === book.id ? { ...item, quantity: item.quantity + 1 } : item,
+        item.bookId === book.id ? { ...item, quantity: Math.min(item.quantity + 1, stock) } : item,
       );
       persist(updated);
-      return;
+      return true;
+    }
+
+    if (stock <= 0) {
+      return false;
     }
 
     persist([
@@ -29,9 +38,11 @@ export function CartProvider({ children }) {
         bookId: book.id,
         title: book.title,
         price: book.price,
+        stock,
         quantity: 1,
       },
     ]);
+    return true;
   }
 
   function setQuantity(bookId, quantity) {
@@ -40,7 +51,17 @@ export function CartProvider({ children }) {
       return;
     }
 
-    persist(items.map((item) => (item.bookId === bookId ? { ...item, quantity } : item)));
+    persist(
+      items.map((item) => {
+        if (item.bookId !== bookId) {
+          return item;
+        }
+
+        const stock = Number(item.stock);
+        const cappedQuantity = Number.isFinite(stock) && stock > 0 ? Math.min(quantity, stock) : quantity;
+        return { ...item, quantity: cappedQuantity };
+      }),
+    );
   }
 
   function clearCart() {
