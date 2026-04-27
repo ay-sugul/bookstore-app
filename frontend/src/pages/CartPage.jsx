@@ -16,9 +16,9 @@ export default function CartPage() {
         items: items.map((item) => ({ bookId: item.bookId, quantity: item.quantity })),
       });
       clearCart();
-      setStatus('Purchase successful. Thank you for shopping with us.');
+      setStatus('Purchase completed successfully. Enjoy your books.');
     } catch (error) {
-      setStatus(error.response?.data?.message || 'Checkout failed.');
+      setStatus(error.response?.data?.message || 'Purchase could not be completed.');
     }
   }
 
@@ -26,7 +26,7 @@ export default function CartPage() {
     <section className="page cart-page">
       <div className="page-head">
         <h2>Your cart</h2>
-        <p>Payment is mocked; purchase will show a success message.</p>
+        <p>Purchase completed successfully. Enjoy your books.</p>
       </div>
 
       <div className="cart-list">
