@@ -1,4 +1,4 @@
-# Bookstore App (Yerel Fullstack Demo)
+# Bookstore App (Yerel Fullstack Demo)-PAPER HARBOR
 
 Bu proje, 3 farklı role sahip bir kitap satış uygulamasıdır:
 - Customer
